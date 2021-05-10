@@ -1,0 +1,60 @@
+\documentclass[a4paper,10pt,twocolumn]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PACKAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\usepackage{graphicx}
+\usepackage[
+	a4paper,
+	bindingoffset=0.2in,%
+	left=2cm,right=2cm,top=2cm,bottom=3cm,%
+	footskip=.25in]
+	{geometry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BIB SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[
+	backend=biber,
+	style=ieee,
+	natbib=true,
+	url=true, 
+	doi=true,
+	eprint=false
+]{biblatex}
+\addbibresource{main.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONFIGS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% VARS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\imagedir{./src}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DOC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%%% TITLE %%%
+
+\author{Martin Pretz, 7060026}
+\title{\huge CVE-2019-11043 \\ \small Arbitrary file reading vulnerability in Pulse Connect Secure}
+\maketitle
+
+%%% CONTENT %%%
+
+\input{abstract.tex}
+\input{introduction.tex}
+\input{sections.tex}
+\input{conclusion.tex}
+
+%%% BIBLIOGRAPHY %%%
+
+\clearpage
+\small
+\onecolumn
+\printbibliography
+
+\end{document}
