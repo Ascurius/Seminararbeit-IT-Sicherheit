@@ -15,15 +15,36 @@
 %Test, Betrieb)?
 %Sonstige Kommentare und Beurteilungen zur Schwachstelle
 
-\section{title}
+\section{Theoretical Foundations}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra, odio at aliquet ultricies, sem arcu cursus sem, sit amet varius lorem leo ac mauris. In hac habitasse platea dictumst. Nullam at dolor ac nisl suscipit tempor eget nec ligula. Aenean cursus porta lorem, eget ornare orci viverra vitae. Curabitur quis eros a tortor fermentum aliquam at id turpis. Mauris sagittis, libero vehicula egestas tincidunt, elit tortor tincidunt ante, non vehicula arcu elit non velit. Nulla malesuada at magna sit amet auctor. Nulla luctus tellus sed ultrices porttitor. Morbi mauris dolor, egestas vitae pharetra vehicula, faucibus eu dolor. Aenean in dapibus velit, quis interdum dui. Sed bibendum elementum massa eu tincidunt.
+\subsection{SSL-VPN}
 
-\section{title}
-Integer turpis elit, scelerisque vel nibh ac, aliquam dictum erat. Vestibulum vulputate dolor sem, vel consectetur enim rutrum tempor. In pretium, enim non vehicula posuere, libero ex porttitor ex, interdum consequat velit est eget magna. Integer consequat, odio non auctor sollicitudin, felis nisi gravida enim, sit amet pharetra augue est ut nulla. Praesent congue nisl ac ullamcorper blandit. Nunc congue nunc in quam ornare lobortis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed efficitur nulla nec sagittis commodo. Suspendisse potenti. Aliquam id sapien sit amet urna venenatis ullamcorper. Proin semper condimentum nibh id dictum. Quisque a pulvinar enim, vitae fringilla nunc. Praesent felis urna, lobortis in dolor ut, varius ultrices enim.
-\section{title}
-Sed ultrices lobortis lectus, sit amet vulputate odio. Donec eu dolor quis dolor blandit consectetur non ut nisl. Morbi ut dictum odio. Integer ipsum lorem, iaculis vel tristique at, volutpat quis mi. Cras vel erat et nisl laoreet volutpat. Fusce tristique pulvinar neque. Praesent convallis tincidunt ante non scelerisque. Phasellus ac sapien erat.
-\section{title}
-Ut mi odio, efficitur quis justo vel, convallis condimentum augue. Donec libero nisi, mollis vel quam in, efficitur luctus turpis. Vivamus molestie, ex vitae convallis pretium, tellus leo consectetur ex, vel dapibus nunc lectus luctus purus. Maecenas purus nunc, lacinia quis rhoncus a, eleifend et erat. Nunc consectetur, augue vel pharetra rutrum, odio massa cursus felis, in sollicitudin odio leo eget enim. Sed in luctus nisl, quis fermentum magna. Sed laoreet dui justo, eu vulputate nunc sollicitudin id. Praesent tincidunt, tellus vitae lobortis tincidunt, velit lectus posuere dolor, vitae interdum odio velit vel leo.
-\section{title}
-Aenean sodales venenatis ex, non elementum augue. Integer ut lobortis sem. Vivamus quis ipsum ex. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aenean venenatis varius libero, vel mollis lacus ultricies quis. Donec tempus dignissim venenatis. Quisque dapibus mauris non odio tristique, suscipit ullamcorper dui fermentum. In ullamcorper quam gravida posuere condimentum. Nulla euismod pretium mauris at auctor. Curabitur vestibulum orci vitae vehicula lacinia.
+Um die vorliegende Sicherheitslücke besser zu verstehen und einordnen zu können, muss zunächst geklärt werden was überhaupt SSL-VPN ist und wie es funktioniert. 
+
+In erster Linie handelt es sich bei eiem SSL-VPN um ein normales VPN welches in zweiter Linie um SSL ergänzt wird. 
+
+\subsection{Pulse Connect Secure}
+
+\section{Description of the Vulnerability}
+\label{sec:description}
+The CVE-2019-11510 is a critical vulnerability that allows attackers to get arbitrary file reading access after they have send a special URI.\autocite{NVDCVE:online}\\
+This vulnarability is part of the CWE-22 class which is associated with "Path Traversal". That means that by explicitly specifying an abnormal path that is "[...] intended to identify a file or directory [...]" \autocite{CWE22-Definition:online} it is possible to gain access to that file or directory without owning the required rights. This is made possible because the software uses an externally specified path and due to the way the software proceeds with that path. The effect is that the software resolves the given paths to files or folders that lie outside the resitriced directory.\autocite{CWE22-Definition:online}
+
+\section{Path traversal}
+\label{sec:path-traversal}
+Allthough path traversal was already mentioned in the previous chapter, one must take a closer look at path traversal in order to fully understand how it works and how it can be avoided. This will be done during the course of this chapter.
+
+\section{How can this vulnarability be exploited?}
+\label{sec:exploitation}
+As already mentioned in \ref{sec:description}, in order to exploit the vulnerability the attacker must send a request (e.g. via HTTP) to the target server that contains a path sequence used for path traversal (see chapter \ref{sec:path-traversal}) and a special URI for the file that the attacker want to gain access to.\autocite{Tenable2:online}\\
+"When a user logs into the admin interface of the VPN [...]"\autocite{Tenable2:online}, the password is stored as plain-text within a MDB file (Microsoft Access Database). The corresponding file can be found at \textit{/data/runtime/mtmp/lmdb/dataa/data.mdb}. Since the attacker already has arbitrary access to all files of the system he can easyly obtain the admin password. With this information the attacker could perform further attacks, e.g. exploiting the CVE-2019-11508, which allows an attacker to upload harmful files while using the credentials he obtained since the credentials actually belong to an authanticated user.\autocite{Tenable2:online}
+
+\section{Example usage}
+\label{sec:example}
+
+\section{Affected}
+\label{sec:affected}
+All versions from between 8.2 to 8.2R12.1, 8.3 to 8.3R7.1 and 9.0 to 9.0R3.4 are affected.\autocite{NVDCVE:online}
+
+\section{Solution}
+Since this vulnerability is caused by the unintended behaviour of Pulse Connect Secure while resolving provided paths and therefore the internal implementation of this software, the vulnerability has been removed by a software patch provided by Pulse Secure.

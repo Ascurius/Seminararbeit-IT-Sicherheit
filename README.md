@@ -1,4 +1,4 @@
-# dhbw-itsecpaper
+# DHBW Seminararbeit IT Sicherheit
 
 Paper for the IT Security lecture
 
