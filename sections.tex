@@ -15,36 +15,67 @@
 %Test, Betrieb)?
 %Sonstige Kommentare und Beurteilungen zur Schwachstelle
 
-\section{Theoretical Foundations}
+\section{Description}
+\label{description}
+The CVE-2019-11510 is a vulnerability that allows attackers to get arbitrary file reading access after they have send a special URI.\autocite{NVDCVE:online}
 
-\subsection{SSL-VPN}
+This vulnerability has been assigned the maximum CVSS classifier of 10.0 Critical\autocite{AWAKE:online} \textbf{TODO: Warum dieser CVSS Score?}
 
-Um die vorliegende Sicherheitslücke besser zu verstehen und einordnen zu können, muss zunächst geklärt werden was überhaupt SSL-VPN ist und wie es funktioniert. 
+This vulnerability is part of the CWE-22 class which is associated with "Path Traversal". That means that by explicitly specifying an abnormal path that is "[...] intended to identify a file or directory [...]" \autocite{CWE22-Definition:online} it is possible to gain access to that file or directory without owning the required rights. This is made possible because the software uses an externally specified path and due to the way the software proceeds with that path. The effect is that the software resolves the given paths to files or folders that lie outside the resitriced directory.\autocite{CWE22-Definition:online}
 
-In erster Linie handelt es sich bei eiem SSL-VPN um ein normales VPN welches in zweiter Linie um SSL ergänzt wird. 
+\section{Threat Analysis}
+\label{analysis}
+Regarding the STRIDE threat model, this vulnerability can be classified as an \textit{information disclosure} in the first place, because primarily the attacker may read files unauthorized. But in the second place this vulnerability also leads to an \textit{elevation of privileges} \autocite{Schneider-Folie-2} because admin credentials are stored in plain-text inside an unrestricted file and because an attacker can arbitrary read files he can easyly obtain the admin credentials.\autocite{Tenable2:online}
+Even though one could argue that \textit{information disclosure} ''only'' affects confidentiality and privacy, this vulnerability justifiably was classified with the CVSS 10.0 Critical, because the \textit{elevation of privileges} additionally affects every single protective goal. \textbf{This includes the confidentiality, integrity, availability, authenticity, identify, deniability and privacy.} Thus every protective goal is lost an the attacker has complete control of the system and the stored data.\autocite{Schneider-Folie-2}
 
-\subsection{Pulse Connect Secure}
+\subsection{Confidentiality}
+\subsection{Integrity}
+\subsection{Availability}
+\subsection{Authenticity}
+\subsection{Identify}
+\subsection{Deniability}
+\subsection{Privacy}
 
-\section{Description of the Vulnerability}
-\label{sec:description}
-The CVE-2019-11510 is a critical vulnerability that allows attackers to get arbitrary file reading access after they have send a special URI.\autocite{NVDCVE:online}\\
-This vulnarability is part of the CWE-22 class which is associated with "Path Traversal". That means that by explicitly specifying an abnormal path that is "[...] intended to identify a file or directory [...]" \autocite{CWE22-Definition:online} it is possible to gain access to that file or directory without owning the required rights. This is made possible because the software uses an externally specified path and due to the way the software proceeds with that path. The effect is that the software resolves the given paths to files or folders that lie outside the resitriced directory.\autocite{CWE22-Definition:online}
 
 \section{Path traversal}
-\label{sec:path-traversal}
-Allthough path traversal was already mentioned in the previous chapter, one must take a closer look at path traversal in order to fully understand how it works and how it can be avoided. This will be done during the course of this chapter.
+\label{path-traversal}
+Allthough path traversal was already mentioned in the previous chapter, one must take a closer look at path traversal in order to fully understand how it works. This will be done during the course of this chapter.
 
-\section{How can this vulnarability be exploited?}
+As previously mentioned path traversal attacks are used to access files or directories that lie outside the web root folder. This is usually achieved by using a path sequence containing the so called ''dot-dot-slashes'' (../) and its variations. Even though the attacker has access to the file system, he is also limited by the operating system's access control (meaning locked or in-use files).\autocite{OWASP-PathTraversal:online}
+
+\section{How can this vulnerability be exploited?}
 \label{sec:exploitation}
-As already mentioned in \ref{sec:description}, in order to exploit the vulnerability the attacker must send a request (e.g. via HTTP) to the target server that contains a path sequence used for path traversal (see chapter \ref{sec:path-traversal}) and a special URI for the file that the attacker want to gain access to.\autocite{Tenable2:online}\\
-"When a user logs into the admin interface of the VPN [...]"\autocite{Tenable2:online}, the password is stored as plain-text within a MDB file (Microsoft Access Database). The corresponding file can be found at \textit{/data/runtime/mtmp/lmdb/dataa/data.mdb}. Since the attacker already has arbitrary access to all files of the system he can easyly obtain the admin password. With this information the attacker could perform further attacks, e.g. exploiting the CVE-2019-11508, which allows an attacker to upload harmful files while using the credentials he obtained since the credentials actually belong to an authanticated user.\autocite{Tenable2:online}
+As already mentioned in \ref{description}, in order to exploit the vulnerability the attacker must send a request (e.g. via HTTP) to the target server that contains a path sequence used for path traversal (see chapter \ref{path-traversal}) and a special URI for the file that the attacker want to gain access to.\autocite{Tenable2:online}
+
+"When a user logs into the admin interface of the VPN [...]"\autocite{Tenable2:online}, the password is stored as plain-text within a MDB file (Microsoft Access Database). The corresponding file can be found at \textit{/data/runtime/mtmp/lmdb/dataa/data.mdb}. Since the attacker already has arbitrary access to all files of the system he can easyly obtain the admin password. With this information the attacker could perform further attacks, e.g. exploiting the CVE-2019-11508, which allows an attacker to upload harmful files while using the credentials he obtained beforehand, since the credentials actually belong to an authanticated user.\autocite{Tenable2:online}
+
+In other cases Kevin Beaumont reported that this vulnerability has lead to 
 
 \section{Example usage}
-\label{sec:example}
+\label{example}
+TODO: hier beispiel wie der exploit durchgeführt wird (mit programm)
 
 \section{Affected}
-\label{sec:affected}
+\label{affected}
 All versions from between 8.2 to 8.2R12.1, 8.3 to 8.3R7.1 and 9.0 to 9.0R3.4 are affected.\autocite{NVDCVE:online}
 
+TODO: Länderliste
+
+\section{Prevention}
+\label{prevention}
+Regarding the prevention of a such a path traversal attack, multiplie measures can be effectiv to different extents. Obviously the best way to prevent this type of attack is to operate the system/program without expecting the user to input a path. But since there are applications that inevitably require the user's input, this challange has to be adressed in a different way.\autocite{OWASP-PathTraversal:online}
+
+In those cases it is advised to make sure, that the user can not specify all parts of the path, instead embeding the user input self defined paths. Another way could be to normalize the path before proceeding eliminating all irregularities.\autocite{OWASP-PathTraversal:online}
+
+Furthermore use indexing for language related files instead of actually entering the language name. For example, the programm should not expect the user to write the word ''Czechoslovakian'', instead it should provide the option to select this language via an index value like ''5 = Czechoslovakian''.\autocite{OWASP-PathTraversal:online}
+
+Last but not least, the usage of chroot jails or code access policies is advised in order to resitrict where files can obtained or saved to.\autocite{OWASP-PathTraversal:online}
+
+\section{Detection}
+\label{detection}
+
 \section{Solution}
+\label{solution}
 Since this vulnerability is caused by the unintended behaviour of Pulse Connect Secure while resolving provided paths and therefore the internal implementation of this software, the vulnerability has been removed by a software patch provided by Pulse Secure.
+
+TODO: Alternativen?
