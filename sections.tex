@@ -17,16 +17,22 @@
 
 \section{Description}
 \label{description}
-The CVE-2019-11510 is a vulnerability that allows attackers to get arbitrary file reading access after they have send a special URI.\autocite{NVDCVE:online}
+The CVE-2019-11510 is a vulnerability that allows attackers to get arbitrary file reading access after they have send a special URI. \autocite{NVDCVE:online}
 
-This vulnerability has been assigned the maximum CVSS classifier of 10.0 Critical\autocite{AWAKE:online} \textbf{TODO: Warum dieser CVSS Score?}
+This vulnerability has been assigned the maximum CVSS classifier of 10.0 Critical \autocite{AWAKE:online} \textbf{TODO: Warum dieser CVSS Score?}
 
-This vulnerability is part of the CWE-22 class which is associated with "Path Traversal". That means that by explicitly specifying an abnormal path that is "[...] intended to identify a file or directory [...]" \autocite{CWE22-Definition:online} it is possible to gain access to that file or directory without owning the required rights. This is made possible because the software uses an externally specified path and due to the way the software proceeds with that path. The effect is that the software resolves the given paths to files or folders that lie outside the resitriced directory.\autocite{CWE22-Definition:online}
+This vulnerability is part of the CWE-22 class which is associated with "Path Traversal". That means that by explicitly specifying an abnormal path that is "[...] intended to identify a file or directory [...]" \autocite{CWE22-Definition:online} it is possible to gain access to that file or directory without owning the required rights. This is made possible because the software uses an externally specified path and due to the way the software proceeds with that path. The effect is that the software resolves the given paths to files or folders that lie outside the resitriced directory. \autocite{CWE22-Definition:online}
 
-\section{Threat Analysis}
+\section{Threat classification}
 \label{analysis}
-Regarding the STRIDE threat model, this vulnerability can be classified as an \textit{information disclosure} in the first place, because primarily the attacker may read files unauthorized. But in the second place this vulnerability also leads to an \textit{elevation of privileges} \autocite{Schneider-Folie-2} because admin credentials are stored in plain-text inside an unrestricted file and because an attacker can arbitrary read files he can easyly obtain the admin credentials.\autocite{Tenable2:online}
-Even though one could argue that \textit{information disclosure} ''only'' affects confidentiality and privacy, this vulnerability justifiably was classified with the CVSS 10.0 Critical, because the \textit{elevation of privileges} additionally affects every single protective goal. \textbf{This includes the confidentiality, integrity, availability, authenticity, identify, deniability and privacy.} Thus every protective goal is lost an the attacker has complete control of the system and the stored data.\autocite{Schneider-Folie-2}
+
+TODO: CWE und CVSS einordnung
+
+Regarding the STRIDE threat model, this vulnerability can be classified as an \textit{information disclosure} in the first place, because primarily the attacker may read files unauthorized. But in the second place this vulnerability also leads to an \textit{elevation of privileges} \autocite{Schneider-Folie-2} because admin credentials are stored in plain-text inside an unrestricted file and because an attacker can arbitrary read files he can easyly obtain the admin credentials. \autocite{Tenable2:online}\\
+Even though one could argue that \textit{information disclosure} ''only'' affects confidentiality and privacy, this vulnerability justifiably was classified with the CVSS 10.0 Critical, because the \textit{elevation of privileges} additionally affects every single protective goal. \autocite{Schneider-Folie-2}
+
+\section{Analysis of the Protective Goals}
+\label{protective-goals}
 
 \subsection{Confidentiality}
 \subsection{Integrity}
@@ -39,16 +45,13 @@ Even though one could argue that \textit{information disclosure} ''only'' affect
 
 \section{Path traversal}
 \label{path-traversal}
-Allthough path traversal was already mentioned in the previous chapter, one must take a closer look at path traversal in order to fully understand how it works. This will be done during the course of this chapter.
-
-As previously mentioned path traversal attacks are used to access files or directories that lie outside the web root folder. This is usually achieved by using a path sequence containing the so called ''dot-dot-slashes'' (../) and its variations. Even though the attacker has access to the file system, he is also limited by the operating system's access control (meaning locked or in-use files).\autocite{OWASP-PathTraversal:online}
+Allthough path traversal was already mentioned in the previous chapter, one must take a closer look at path traversal in order to fully understand how it works. This will be done during the course of this chapter.\\
+As previously mentioned path traversal attacks are used to access files or directories that lie outside the web root folder. This is usually achieved by using a path sequence containing the so called ''dot-dot-slashes'' (../) and its variations. Even though the attacker has access to the file system, he is also limited by the operating system's access control (meaning locked or in-use files). \autocite{OWASP-PathTraversal:online}
 
 \section{How can this vulnerability be exploited?}
 \label{sec:exploitation}
-As already mentioned in \ref{description}, in order to exploit the vulnerability the attacker must send a request (e.g. via HTTP) to the target server that contains a path sequence used for path traversal (see chapter \ref{path-traversal}) and a special URI for the file that the attacker want to gain access to.\autocite{Tenable2:online}
-
-"When a user logs into the admin interface of the VPN [...]"\autocite{Tenable2:online}, the password is stored as plain-text within a MDB file (Microsoft Access Database). The corresponding file can be found at \textit{/data/runtime/mtmp/lmdb/dataa/data.mdb}. Since the attacker already has arbitrary access to all files of the system he can easyly obtain the admin password. With this information the attacker could perform further attacks, e.g. exploiting the CVE-2019-11508, which allows an attacker to upload harmful files while using the credentials he obtained beforehand, since the credentials actually belong to an authanticated user.\autocite{Tenable2:online}
-
+As already mentioned in \ref{description}, in order to exploit the vulnerability the attacker must send a request (e.g. via HTTP) to the target server that contains a path sequence used for path traversal (see chapter \ref{path-traversal}) and a special URI for the file that the attacker want to gain access to. \autocite{Tenable2:online}\\
+"When a user logs into the admin interface of the VPN [...]" \autocite{Tenable2:online}, the password is stored as plain-text within a MDB file (Microsoft Access Database). The corresponding file can be found at \textit{/data/runtime/mtmp/lmdb/dataa/data.mdb}. Since the attacker already has arbitrary access to all files of the system he can easyly obtain the admin password. With this information the attacker could perform further attacks, e.g. exploiting the CVE-2019-11508, which allows an attacker to upload harmful files while using the credentials he obtained beforehand, since the credentials actually belong to an authanticated user. \autocite{Tenable2:online}\\
 In other cases Kevin Beaumont reported that this vulnerability has lead to 
 
 \section{Example usage}
@@ -57,22 +60,45 @@ TODO: hier beispiel wie der exploit durchgeführt wird (mit programm)
 
 \section{Affected}
 \label{affected}
-All versions from between 8.2 to 8.2R12.1, 8.3 to 8.3R7.1 and 9.0 to 9.0R3.4 are affected.\autocite{NVDCVE:online}
+All versions from between 8.2 to 8.2R12.1, 8.3 to 8.3R7.1 and 9.0 to 9.0R3.4 are affected. \autocite{NVDCVE:online}
 
 TODO: Länderliste
 
 \section{Prevention}
 \label{prevention}
-Regarding the prevention of a such a path traversal attack, multiplie measures can be effectiv to different extents. Obviously the best way to prevent this type of attack is to operate the system/program without expecting the user to input a path. But since there are applications that inevitably require the user's input, this challange has to be adressed in a different way.\autocite{OWASP-PathTraversal:online}
+Regarding the prevention of a such a path traversal attack, multiplie measures can be effectiv to different extents. Obviously the best way to prevent this type of attack is to operate the system/program without expecting the user to input a path. But since there are applications that inevitably require the user's input, this challange has to be adressed in a different way. \autocite{OWASP-PathTraversal:online}\\
+In those cases it is advised to make sure, that the user can not specify all parts of the path, instead embeding the user input self defined paths. Another way could be to normalize the path before proceeding eliminating all irregularities. \autocite{OWASP-PathTraversal:online}\\
+Last but not least, the usage of chroot jails or code access policies is advised in order to resitrict where files can be obtained or saved to. \autocite{OWASP-PathTraversal:online}
 
-In those cases it is advised to make sure, that the user can not specify all parts of the path, instead embeding the user input self defined paths. Another way could be to normalize the path before proceeding eliminating all irregularities.\autocite{OWASP-PathTraversal:online}
+\section{Mitigation}
+\label{mitigation}
+During the course of this chapter it will be discussed how this vulnerability can be mitigated. Thereby, the analysis is divided in three different aspects which are the implementation, the architecture and design, as well as the operation.
 
-Furthermore use indexing for language related files instead of actually entering the language name. For example, the programm should not expect the user to write the word ''Czechoslovakian'', instead it should provide the option to select this language via an index value like ''5 = Czechoslovakian''.\autocite{OWASP-PathTraversal:online}
+\subsection{Implementation}
+\label{implementation}
+One of the most important methods of prevention is the input validation. It is recommended to define acceptable input based on the "accept known good" validation strategy. So all input either must directly comply with the specifications or must be converted in a way that does comply. It is of crucial importance that the validation is performed as accurate and comprehensive as possible, otherwise the validation misses its point. More precisely, looking "[...] exclusively for malicious or malformed [paths]" \autocite{CWE22-Definition:online} is not what should be done during validation. Instead try to limit directly what characters are allowed so that the attacker cannot even enter a harmful path. Concrete it should be prohibited to enter ".." character, instead only allow a single "." character. File extensions should also be concerned, meaning that the file extensions is not allowed to be included in the path but must be selected from a predefined list. This way it can be restricted what types of files can be read. Furthermore directory separators such as the the "/" or the "\textbackslash" character should be prohibited. This has to be done not only once per path but multiple times in order to minimize the error rate. For example if the validation checks for the string "../" within the path ".../...//", there would still remain the "../" string, even tough "../" has been removed twice from the original path. \autocite{CWE22-Definition:online}\\
+Furthermore warnings or error messages should only contain as little information as possible that are exclusively useful to intended recipients. This way, attackers cannot obtain detailed information about the inner workings of the system. \autocite{CWE22-Definition:online}
 
-Last but not least, the usage of chroot jails or code access policies is advised in order to resitrict where files can obtained or saved to.\autocite{OWASP-PathTraversal:online}
+\subsection{Architecture and Design}
+\label{design}
+This section will summ up the most common decisions regarding the architecture and design of a programm in order to prevent or at least mitigate the impact of the vulnerability.
+
+If any user input is to be validated on the client side, it is advised to ensure that this validation process is duplicated on the server side to prevent that the attacker can use CWE-602 vulnerabilities he makes use of CVE-2019-11510. This would allow the attacker to bypass client sided validations and thus the attacker would still be able to send an spcial path to perform a path traversal. \autocite{CWE22-Definition:online}\\
+When running the software in production, ensure that the program the lowest privilege level that is necessary to achieve the task. This way, even if an attacker sends an harmful to the server, the software which is proceessing the input is limited due to its low privileges. Though this method cannot prevent this attack from happening, it can limit the impact.\autocite{CWE22-Definition:online}\\
+Access to files can be prevented if they are stored outside the web applications root. However if this is not possible, a different solution would be to store files in a separate directory and to use the web servers access control features to restrict the access, preventing attackers from directly requesting files. For example, defining a fixed constant in each calling programm, checking if this constant does exist in the file and if absent the file was directly requested and should be closed. \autocite{CWE22-Definition:online}\\
+If user input is required and the number of possible inputs is limited, assign/map an ID to every possible input value accepting only the predefined IDs and rejecting requests using undefined IDs. \autocite{CWE22-Definition:online} "For example, ID 1 could map to "inbox.txt" and ID 2 could map to "profile.txt"." \autocite{CWE22-Definition:online} This method is called an "Acces Reference Map".
+
+\subsection{Operation}
+\label{operation}
+Content of this section include methods of prevention for operating the program in production environment.
+
+The use of a dedicated application firewall can be effectiv to detect and prevent attacks trageting this vulnerability. This is escpecially useful, if the vulnerability cannot be fixed by yourself because the program belongs to a third party. \autocite{CWE22-Definition:online} It has to be noted that this can only act as a temporary solution until a patch is available.\\
+Additionally, the program can be run inside a sandbox environment in way that separates it from the operating system. This will heavily restrict the accessable files and directories. But it has to be noted that this solution only reduces the impact an attack can have on the operating system, while the application itself can "[...] still be subject to compromise." \autocite{CWE22-Definition:online} Furthermore the degree of effectiveness depends on the scope and possibilities of the sandbox. Eligible sandbox systems could be Unix chroot jail, SELinux or AppArmor. \autocite{CWE22-Definition:online}
 
 \section{Detection}
 \label{detection}
+
+This way, it is not just prevented that an attacker can acces files, furthermore it can be detected if an file was unauthorized requested directly, providing an detection method.
 
 \section{Solution}
 \label{solution}
