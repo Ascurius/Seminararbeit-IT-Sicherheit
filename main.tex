@@ -10,6 +10,9 @@
 	left=2cm,right=2cm,top=2cm,bottom=3cm,%
 	footskip=.25in]
 	{geometry}
+\usepackage[obeyspaces]{url}
+\usepackage{tabularx}
+\usepackage{booktabs}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BIB SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -25,7 +28,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONFIGS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+%\renewcommand{\tabularxcolumn}[1]{>{\small}m{#1}}		==> Virtikale Zentrierung der Zelle
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% VARS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -40,7 +43,7 @@
 %%% TITLE %%%
 
 \author{Martin Pretz, 7060026}
-\title{\huge CVE-2019-11510 \\ \small Arbitrary file reading vulnerability in Pulse Connect Secure}
+\title{\huge Why path traversal attacks are so devasating but relatively easy to avoid in theory \linebreak \linebreak \small CVE-2019-11510}
 \maketitle
 
 %%% CONTENT %%%
