@@ -17,35 +17,33 @@
 
 \section{Description}
 \label{description}
-The CVE-2019-11510 is a vulnerability that allows attackers to get arbitrary file reading access within a Pulse Secure VPN after they have send a special URI. \autocite{NVDCVE:online}
+The CVE-2019-11510 is a vulnerability that allows attackers to get arbitrary file reading access within a Pulse Connect Secure VPN server after they have send a special URI. \autocite{NVDCVE:online}
 
-This vulnerability is part of the CWE-22 class which is associated with "Path Traversal". That means that by explicitly specifying an abnormal path that is "[...] intended to identify a file or directory [...]" \autocite{CWE22-Definition:online} it is possible to gain access to that file or directory without owning the required rights. This is made possible because the software uses an externally specified path and due to the way the software proceeds with that path. The effect is that the software resolves the given paths to files or folders that lie outside the resitriced directory. \autocite{CWE22-Definition:online}
+This vulnerability is part of the CWE-22 class which is associated with "Path Traversal". That means that by explicitly specifying an abnormal path that is "[...] intended to identify a file or directory [...]" \autocite{CWE22-Definition:online} it is possible to gain access to that file or directory outside the intended scope. This is made possible because the software uses an user specified path and due to the way the software proceeds with that path. As a result the software resolves the given paths to files or folders that lie outside the restricted directory. \autocite{CWE22-Definition:online}
 
 \section{Threat classification}
 \label{analysis}
 \subsection{STRIDE}
 \label{STRIDE}
-Regarding the STRIDE threat model, this vulnerability can be classified as an \textit{information disclosure} in the first place, because primarily the attacker may read files unauthorized. But in the second place this vulnerability also leads to an \textit{elevation of privileges} \autocite{Schneider-Folie-2} because admin credentials are stored in plain-text inside an unrestricted file and because an attacker can arbitrary read files he can easyly obtain the admin credentials. \autocite{Tenable2:online}
+Regarding the STRIDE threat model, this vulnerability can be classified as an \textit{information disclosure} in the first place, because primarily the attacker may read files unauthorized. But in the second place this vulnerability also leads to an \textit{elevation of privileges} \autocite{Schneider-Folie-2} because admin credentials are stored in plain-text inside an unrestricted file. Since an attacker can arbitrary read files he can easyly obtain the admin credentials. \autocite{Tenable2:online}
 
 \subsection{CVSS Rating}
 \label{CVSS}
 The CVE-2019-11510 has been assigned the CVSS rating of \textit{10.0 CRITCAL} based upon the version 3 system and the rating of \textit{7.5 HIGH} within the version 2 system. \autocite{NVDCVE:online} Regarding the CVSS 3.1 system, this vulnerability has the following attack vectors: \textit{AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H}. 
 
-The first attack vector (\textit{AV}) is specified as network (\textit{N}), meaning that this vulnerability is so called "remotely exploitable" which means that the attacker does not have to be physically present at the target. The attack complexity (\textit{AC}) is defined as low (\textit{L}) which means that no special conditions or circumstances need to be present for this vulnerability to be exploited. The attacker can repeatedly use this vulnerability. Regarding the third attack vector (\textit{PR}) it is defined as none (\textit{N}) since no privileges are required because this attack is using regular requests. Furthermore this vulnerability requires no (\textit{N}) user interaction (\textit{UI}) to be exploited. The Scope (\textit{S}) of the vulnerability is specified as changed (\textit{C}) because the attack does not only affect the attacked component but indeed affects the whole system. The impact metrics confidentialy (\textit{C}), integrity (\textit{I}) and availability (\textit{A}) are all highly (\textit{H}) affected by this vulnerability.\autocite{NVDCVSSv30:online}
+The first attack vector (\textit{AV}) is specified as network (\textit{N}), meaning that this vulnerability is so called "remotely exploitable" which means that the attacker does not have to be physically present at the target. The attack complexity (\textit{AC}) is defined as low (\textit{L}) which means that no special conditions or circumstances need to be present for this vulnerability to be exploited. The attacker can repeatedly use this vulnerability. The third attribute (\textit{PR}) it is defined as none (\textit{N}) since no privileges are required because this attack is using regular requests. Furthermore this vulnerability requires no (\textit{N}) user interaction (\textit{UI}) to be exploited. The Scope (\textit{S}) of the vulnerability is specified as changed (\textit{C}) because the attack does not only affect the attacked component but indeed affects the whole system. The impact metrics confidentialy (\textit{C}), integrity (\textit{I}) and availability (\textit{A}) are all highly (\textit{H}) affected by this vulnerability.\autocite{NVDCVSSv30:online}
 
 Even though one could argue that the attack type \textit{information disclosure} ''only'' affects confidentiality and privacy with ragrds to STRIDE, the attack type \textit{elevation of privileges} does affect every single protective goal. \autocite{Schneider-Folie-2} Thus this paper concludes that the given CVSS rating is justifiably at \textit{10.0 CRITCAL} and would rate this vulnerability the same way.
 
 \section{What is Path Traversal?}
 \label{path-traversal}
-Allthough path traversal was already mentioned in the previous chapter, one must take a closer look at path traversal in order to fully understand how it works. This will be done during the course of this chapter.
-
-As previously mentioned path traversal attacks are used to access files or directories that lie outside the web root folder. This is usually achieved by using a path sequence containing the so called ''dot-dot-slashes'' (../) and its variations. Even though the attacker has access to the file system, he is also limited by the operating system's access control (meaning locked or in-use files). \autocite{OWASP-PathTraversal:online}
+As previously mentioned path traversal attacks are used to access files or directories that lie outside the web root folder. This is usually achieved by using a path sequence containing the so called ''dot-dot-slashes'' (../) and its variations. Even though the attacker has access to the file system, he is also limited by the operating system's access control. \autocite{OWASP-PathTraversal:online} This means that the attacker only has access to files or folders that the compromised account can also access. 
 
 \section{How can this vulnerability be exploited?}
 \label{sec:exploitation}
-As already mentioned in \ref{description}, in order to exploit the vulnerability the attacker can send a simple HTTP GET request to the target endpoint that contains a path sequence used for path traversal (see chapter \ref{path-traversal}) and a special URI for the file that the attacker want to gain access to. \autocite{Tenable2:online}
+As already mentioned in section \ref{description}, in order to exploit the vulnerability the attacker can send a simple HTTP GET request to the target endpoint with a path sequence that contains the file that the attacker want to gain access to. \autocite{Tenable2:online}
 
-"When a user logs into the admin interface of the VPN [...]" \autocite{Tenable2:online}, the password is stored as plain-text within a MDB file (Microsoft Access Database). The corresponding file can be found at \path{/data/runtime/mtmp/lmdb/dataa/data.mdb}. Since the attacker already has arbitrary access to all files of the system he can easyly obtain the admin password. With this information the attacker could perform further attacks, e.g. exploiting the CVE-2019-11508, which allows an attacker to upload harmful files while using the credentials he obtained beforehand, since the credentials actually belong to an authanticated user. \autocite{Tenable2:online}
+"When a user logs into the admin interface of the VPN [...]" \autocite{Tenable2:online}, the password is stored as plain-text within a MDB file (Microsoft Access Database). The corresponding file can be found at \path{/data/runtime/mtmp/lmdb/dataa/data.mdb}. Since the attacker already has arbitrary access to all files of the system he can easyly obtain the admin password. With this information the attacker could perform further attacks, e.g. exploiting the CVE-2019-11508 which allows an attacker to upload harmful files. Therfore he can use the credentials he obtained beforehand, since the credentials actually belong to an authanticated user. \autocite{Tenable2:online}
 
 In different cases the attacker was able to read \path{etc/passwd} by sending the path \path{/dana-na/../dana/html5acc/guacamole/../../../../../../etc/passwd?/dana/html5acc/guacamole/} to the appropriate endpoint of the Pulse Secure VPN. \autocite{ExploitExample:online}
 
@@ -53,32 +51,28 @@ Kevin Beaumont reported that this vulnerability was used to gain admin access, i
 
 \section{Protective Goals}
 \label{protective-goals}
-For all protective goals applies that even if it cannot be compromised in the first place it is only a quastion of when the attacker will be able to compromise the corresponding protective goal. Eihter directly by exploiting the CVE-2019-11510 or indirectly by exploiting any other vulnerabilities he may find.
+It is important to mention that the \textit{information discolsure} ''only'' compromises confidentiality and privacy in the first place. But in the second place, the \textit{elevation privileges} compromise the remaining protective goals. Eihter directly by exploiting the CVE-2019-11510 or indirectly by exploiting any other vulnerabilities he may find.
 
 \subsection{Confidentiality}
-The Confidentiality of the data is not longer guaranteed as the attacker can arbitrary read files. Furthermore if there would be some sort of first line limitation against the file reading it would not stand long because the attacker can read the passwords and therefore obtain the admin password which grants presumably full system control.
+The Confidentiality of the data is not longer guaranteed as the attacker can read arbitrary files.
 
 \subsection{Integrity}
-The integrity of the data is only ensure in the first place since this vulnerability ''only'' allows attackers to read files. But in the second place the integrity of the data is lost due to the fact that the attacker achieved a privilege escalation and is capable of changing files or uploading harmful changes either directly or by using another vulnerability.
+The integrity of the data is just ensured in the first place since this vulnerability ''only'' allows attackers to read files. But in the second place the integrity of the data is lost due to the fact that the attacker achieved a privilege escalation and is capable of changing files or uploading harmful changes either directly or by using another vulnerability.
 
 \subsection{Availability}
-The availability of the network is also no longer guaranteed as the attackers has admin access he can temporarily or even permanently paralyze the VPN.
+The availability of the network is also no longer guaranteed as the attackers has admin access. He can temporarily or even permanently shut down the system.
 
 \subsection{Authenticity}
-It can also no longer be assumed that the data is authentic because the attacker has change/write permissions because of the admin access.
+It can also no longer be assumed that the data is authentic because the attacker has obtained admin privileges.
 
 \subsection{Identity}
-Because the attacker as admin in the network, the identity goal is lost. Additionally he may be able to obtain the passwords of other users which will then compromise every their user identity.
+Because the attacker obtained the admin access within the network, the identity goal is lost. Additionally he may be able to obtain the credentials of other users which will then compromise also their user identity.
 
 \subsection{Deniability}
-Since the intruder has admin access he can erase all hints on his presence e.g. by deleting log files.
+Since the intruder has admin access he can erase all hints on his presence, e.g. by deleting log files.
 
 \subsection{Privacy}
-Even though in theory the privacy within the VPN is no longer guaranteed it has to be noted that the attacker can only intecerpt traffic within the network in the first palce. Of course in the the end the attacker can also use the access he gained to attack different devices within the network and if successfully can also compromise the privacy on user devices within the network. 
-
-\section{Example usage}
-\label{example}
-TODO: hier beispiel wie der exploit durchgeführt wird (mit programm)
+The privacy within the VPN is no longer guaranteed as the attacker can intecerpt traffic within the network. The attacker can also use the access he gained to attack different devices within the network and if successfully can also compromise the privacy on user devices within the network.
 
 \section{Affected}
 \label{affected}
@@ -108,40 +102,40 @@ Even though a patch was provided by Pulse Secure in April 2019, initially little
     \end{table}
 \end{center}
 
-\section{Mitigation}
+\section{Prevention}
 \label{mitigation}
-During the course of this chapter it will be discussed how this vulnerability can be mitigated. Thereby, the analysis is divided in three different aspects which are the implementation, the architecture and design, as well as the operation.
+During the course of this chapter it will be discussed how this vulnerability can be mitigated. Thereby, the analysis is divided in three different aspects which are the implementation, the architecture/design and the operation.
 
 \subsection{Implementation}
 \label{implementation}
-One of the most important methods of prevention is the input validation. It is recommended to define acceptable input based on the "accept known good" validation strategy. So all input either must directly comply with the specifications or must be converted in a way that does comply. It is of crucial importance that the validation is performed as accurate and comprehensive as possible, otherwise the validation misses its point. More precisely, looking "[...] exclusively for malicious or malformed [paths]" \autocite{CWE22-Definition:online} is not what should be done during validation. Instead try to limit directly what characters are allowed so that the attacker cannot even enter a harmful path. Concrete it should be prohibited to enter ".." character, instead only allow a single "." character. File extensions should also be concerned, meaning that the file extensions is not allowed to be included in the path but must be selected from a predefined list. This way it can be restricted what types of files can be read. Furthermore directory separators such as the the "/" or the "\textbackslash" character should be prohibited. This has to be done not only once per path but multiple times in order to minimize the error rate. For example if the validation checks for the string "../" within the path ".../...//", there would still remain the "../" string, even tough "../" has been removed twice from the original path. \autocite{CWE22-Definition:online}\\
+One of the most important methods of prevention is the input validation. It is recommended to define acceptable input based on the "accept known good" validation strategy. So all input either must directly comply with the specifications or must be converted in a way that does comply. It is of crucial importance that the validation is performed as accurate and comprehensive as possible, otherwise the validation misses its point. More precisely, looking "[...] exclusively for malicious or malformed [paths]" \autocite{CWE22-Definition:online} is not what should be done during validation. Instead try to limit directly what characters are allowed so that the attacker cannot even enter a harmful path. Concrete it should be prohibited to enter ".." character. File extensions should also be considered illegal, meaning that the file extensions should not be allowed to be included in the path but must be selected from a predefined list. This way it can be restricted what types of files can be read. Furthermore directory separators such as the the "/" or the "\textbackslash" character should be prohibited. This has to be done not only once per path but multiple times in order to minimize the error rate. For example if the validation checks for the string "../" within the path ".../...//", there would still remain the "../" string, even tough "../" has been removed twice from the original path. \autocite{CWE22-Definition:online}\\
 Furthermore warnings or error messages should only contain as little information as possible that are exclusively useful to intended recipients. This way, attackers cannot obtain detailed information about the inner workings of the system. \autocite{CWE22-Definition:online}
 
 \subsection{Architecture and Design}
 \label{design}
-This section will summ up the most common decisions regarding the architecture and design of a programm in order to prevent or at least mitigate the impact of the vulnerability.
+This section will sum up the most common decisions regarding the architecture and design of a programm in order to prevent or at least mitigate the impact of the vulnerability.
 
-If any user input is to be validated on the client side, it is advised to ensure that this validation process is duplicated on the server side to prevent that the attacker can use CWE-602 vulnerabilities he makes use of CVE-2019-11510. This would allow the attacker to bypass client sided validations and thus the attacker would still be able to send an spcial path to perform a path traversal. \autocite{CWE22-Definition:online}\\
-When running the software in production, ensure that the program the lowest privilege level that is necessary to achieve the task. This way, even if an attacker sends an harmful to the server, the software which is proceessing the input is limited due to its low privileges. Though this method cannot prevent this attack from happening, it can limit the impact.\autocite{CWE22-Definition:online}\\
-Access to files can be prevented if they are stored outside the web applications root. However if this is not possible, a different solution would be to store files in a separate directory and to use the web servers access control features to restrict the access, preventing attackers from directly requesting files. For example, defining a fixed constant in each calling programm, checking if this constant does exist in the file and if absent the file was directly requested and should be closed. \autocite{CWE22-Definition:online}\\
-If user input is required and the number of possible inputs is limited, assign/map an ID to every possible input value accepting only the predefined IDs and rejecting requests using undefined IDs. \autocite{CWE22-Definition:online} "For example, ID 1 could map to "inbox.txt" and ID 2 could map to "profile.txt"." \autocite{CWE22-Definition:online} This method is called an "Acces Reference Map".
+If any user input is to be validated on the client side, it is advised to ensure that this validation process is duplicated on the server side. The goal is to prevent the attacker from using attacks of type CWE-602. This would allow the attacker to bypass client sided validations and thus the attacker would still be able to send an special path to perform a path traversal. \autocite{CWE22-Definition:online}\\
+When running the software in production, ensure that the program has the lowest privilege level that is necessary to achieve the task. This way, even if an attacker sends an harmful path to the server, the software is limited due to its low privileges. Even though this method cannot prevent attacks from happening, it can limit the impact.\autocite{CWE22-Definition:online}\\
+Access to files can be prevented if they are stored outside the web applications root. However if this is not possible, a different solution would be to store files in a separate directory and to use the web servers access control features to restrict the access, preventing attackers from directly requesting files. For example, defining a fixed constant in each calling programm, checking if this constant does exist in the file and if absent the file was directly requested and the request should be denied. \autocite{CWE22-Definition:online}\\
+If user input is required and the number of possible inputs is limited, assign/map an ID to every possible input value accepting only the predefined IDs and rejecting requests using undefined IDs. \autocite{CWE22-Definition:online} "For example, ID 1 could map to "inbox.txt" and ID 2 could map to "profile.txt"." \autocite{CWE22-Definition:online} This method is called an "Access Reference Map".
 
 \subsection{Operation}
 \label{operation}
-Content of this section include methods of prevention for operating the program in production environment.
+Content of this section include methods of prevention for operating the program in production environments.
 
 The use of a dedicated application firewall can be effectiv to detect and prevent attacks trageting this vulnerability. This is escpecially useful, if the vulnerability cannot be fixed independently because the program belongs to a third party. \autocite{CWE22-Definition:online} It has to be noted that this can only act as a temporary solution until a patch is available.
 
-Additionally, the program can be run inside a sandbox environment in way that separates it from the operating system. This will heavily restrict the accessable files and directories. But it has to be noted that this solution only reduces the impact an attack can have on the operating system, while the application itself can "[...] still be subject to compromise." \autocite{CWE22-Definition:online} Furthermore the degree of effectiveness depends on the scope and possibilities of the sandbox. Eligible sandbox systems could be Unix chroot jail, SELinux or AppArmor. \autocite{CWE22-Definition:online}
+Additionally, the program can be run inside a sandbox environment in way that separates it from the operating system itself and other services running on it. This will heavily restrict the accessable files and directories. But it has to be noted that this solution only reduces the impact an attack can have on the operating system, while the application itself can "[...] still be subject to compromise." \autocite{CWE22-Definition:online} Furthermore the degree of effectiveness depends on the scope and possibilities of the sandbox. Eligible sandbox systems could be Unix chroot jail, SELinux or AppArmor. \autocite{CWE22-Definition:online}
 
 \section{Detection}
 \label{detection}
 A fundamental method for detection is to review the source code with special attention to potential weaknesses that may facilitate path traversal attacks. This method is highly effective and can also be used for a focused review of certain code parts. Such an analysis can either be conducted manually, in which case it is recommended that at least two people are involved in the analysis to reduce the error rate as far as possible, or it can be performed automatically.
 
-As allready mentioned in section \ref{design}, the access to files can be resitriced by defining constants for each calling program. But this method is not just about prevention, furthermore it can be observed if an file was unauthorized requested directly, providing an detection method for path traversal attacks.
+As already mentioned in section \ref{design}, the access to files can be resitriced by defining constants for each calling program. But this method is not just about prevention, furthermore it can be observed if an file was unauthorized requested directly, providing an detection method for path traversal attacks.
 
 \section{Solution}
 \label{solution}
-This vulnerability has been fixed in with an out-of-cycle path in April 2019 by Pulse Secure. But even though the patch was provided the vulnerability was active until 2020 due to the fact that some users of Pulse Connect Secure VPN had stil not installed the patch.
+This vulnerability has been fixed in with an out-of-cycle patch in April 2019 by Pulse Secure. But even though the patch was provided the vulnerability was active until 2020 due to the fact that some users of Pulse Connect Secure VPN had still not installed the patch.
 
-Even though the specific patch can not be reviewed, it can be assumed that Pulse Secure has used one of the mitigation methods mentioned in \ref{mitigation} in order to fix the vulnerability.
+Even though the specific patch can not be reviewed, it can be assumed that Pulse Secure has used one of the mitigation methods mentioned in section \ref{mitigation} in order to fix the vulnerability. Accordingly, the assumption of this paper is that Pulse Secure has fixed the vulnerability by adjusting their implementation. Specifically it is assumed that they implemented at least some sort of validation. In fact, this is also the solution which this paper would recommend in the first place. Additionally this paper would assign the program as little permissions as possible and would encapsulate the program in a closed i.e. a sandbox environment.
